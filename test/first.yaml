@@ -1,0 +1,34 @@
+schemaVersion: 2.1.0
+metadata:
+  name: devfile-api
+  namespace: abaker9-devspaces
+attributes:
+  controller.devfile.io/storage-type: ephemeral
+projects:
+  - git:
+      remotes:
+        origin: 'https://github.com/abaker-9/dev.git'
+    name: dev
+components:
+  - container:
+      image: 'quay.io/devfile/universal-developer-image:ubi8-latest'
+      memoryLimit: 2Gi
+      memoryRequest: 256Mi
+      sourceMapping: /projects
+    name: devtools
+commands:
+  - exec:
+      commandLine: ./build.sh
+      component: devtools
+      label: Run build of CRDs and schemas
+    id: build-crds-and-schemas
+  - exec:
+      commandLine: go mod vendor
+      component: devtools
+      label: Fetch dependencies for Go LS
+    id: fetch-dependencies-for-go-ls
+  - exec:
+      commandLine: go test -v ./...
+      component: devtools
+      label: Run tests
+    id: test
